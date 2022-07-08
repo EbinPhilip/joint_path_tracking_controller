@@ -7,13 +7,13 @@
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="ebin@todo.todo">ebin</maintainer>
+  <maintainer email="stargazer18@gmail.com">Ebin Philip</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>MIT</license>
 
 
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
@@ -49,6 +49,12 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
+  <depend>hardware_interface</depend>
+  <depend>controller_interface</depend>
+  <depend>ros_control</depend>
+  <depend>ros_controllers</depend>
+  <depend>roscpp</depend>
+  <depend>pluginlib</depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

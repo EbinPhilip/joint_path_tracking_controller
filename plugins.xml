@@ -1,0 +1,5 @@
+<library path="lib/libjoint_path_tracking_controller">
+    <class name="joint_path_tracking_controller/JointPathTrackingController" type="jpt_controller::JointPathTrackingController" base_class_type="controller_interface::ControllerBase">
+        <description>Plugin for joint path tracking controller.</description>
+    </class>
+</library>

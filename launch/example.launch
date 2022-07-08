@@ -1,0 +1,17 @@
+<launch>
+    <rosparam file="$(find joint_path_tracking_controller)/config/actuators.yaml" command="load" ns="joint_path_tracking_controller_example/" />
+    <rosparam file="$(find joint_path_tracking_controller)/config/joints.yaml" command="load" ns="joint_path_tracking_controller_example/" />
+    <rosparam file="$(find joint_path_tracking_controller)/config/transmissions.yaml" command="load" ns="joint_path_tracking_controller_example/" />
+    <rosparam file="$(find joint_path_tracking_controller)/config/controllers.yaml" command="load" />
+
+    <node name="joint_path_tracking_controller_example" pkg="joint_path_tracking_controller" type="example" output="screen" />
+
+    <node
+        name="controller_spawner"
+        pkg="controller_manager"
+        type="spawner"
+        respawn="false"
+        output="screen"
+        args="joint_state_controller
+        joint3_controller" />
+</launch>

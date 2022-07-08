@@ -55,6 +55,7 @@
   <depend>ros_controllers</depend>
   <depend>roscpp</depend>
   <depend>pluginlib</depend>
+  <depend>configurable_control_hw</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

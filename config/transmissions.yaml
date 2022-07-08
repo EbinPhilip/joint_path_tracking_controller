@@ -1,0 +1,19 @@
+transmissions:
+  # transmission_3:
+  #   joints:
+  #     - joint3
+  #   actuators:
+  #     - linear_actuator_controller_actuator
+  #   type: transmission_interface::SimpleTransmission
+  transmission_3:
+    joints:
+      - joint3
+    actuators:
+      - linear_actuator_controller_actuator
+    type: Linear_Actuator::Transmission_Loader
+    package: linear_actuator_controller
+    min_step_deg: 1.8
+    micro_steps: 8
+    lead: 0.008
+
+

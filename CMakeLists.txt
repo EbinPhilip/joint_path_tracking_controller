@@ -12,6 +12,7 @@ find_package(catkin REQUIRED
     hardware_interface
     controller_interface
     pluginlib
+    configurable_control_hw
 )
 
 ## System dependencies are found with CMake's conventions
@@ -110,6 +111,7 @@ catkin_package(
                 hardware_interface
                 controller_interface
                 pluginlib
+                configurable_control_hw
 #  DEPENDS system_lib
 )
 
@@ -153,6 +155,12 @@ add_library(${PROJECT_NAME}
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+add_executable(example 
+  src/example.cpp
+)
+target_link_libraries(example
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

@@ -2,12 +2,17 @@ cmake_minimum_required(VERSION 3.0.2)
 project(joint_path_tracking_controller)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED
+    roscpp
+    hardware_interface
+    controller_interface
+    pluginlib
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -101,7 +106,10 @@ find_package(catkin REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES joint_path_tracking_controller
-#  CATKIN_DEPENDS other_catkin_pkg
+ CATKIN_DEPENDS roscpp
+                hardware_interface
+                controller_interface
+                pluginlib
 #  DEPENDS system_lib
 )
 
@@ -112,14 +120,14 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
+    include/${PROJECT_NAME}
+    ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/joint_path_tracking_controller.cpp
-# )
+add_library(${PROJECT_NAME}
+  src/Joint_Path_Tracking_Controller.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

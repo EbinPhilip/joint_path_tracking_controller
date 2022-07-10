@@ -13,6 +13,10 @@ find_package(catkin REQUIRED
     controller_interface
     pluginlib
     configurable_control_hw
+    actionlib
+    control_msgs
+    trajectory_msgs
+    rotational_units
 )
 
 ## System dependencies are found with CMake's conventions
@@ -112,6 +116,10 @@ catkin_package(
                 controller_interface
                 pluginlib
                 configurable_control_hw
+                actionlib
+                trajectory_msgs
+                control_msgs
+                rotational_units
 #  DEPENDS system_lib
 )
 
@@ -129,6 +137,9 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
   src/Joint_Path_Tracking_Controller.cpp
+)
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
 )
 
 ## Add cmake target dependencies of the library

@@ -56,6 +56,12 @@
   <depend>roscpp</depend>
   <depend>pluginlib</depend>
   <depend>configurable_control_hw</depend>
+  <depend>actionlib</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>control_msgs</depend>
+  <depend>rotational_units</depend>
+  <depend>dynamixel_x_controller</depend>
+  <depend>linear_actuator_controller</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -8,8 +8,20 @@ joint3_controller:
     goal_tolerance_ratio: 0.95
     speed_backoff_ratio: 0.2
     joints:
-        - name: joint3
+        - name: joint1
           min_pos: 0.0
-          max_pos: 4.0
-          default_speed: 1.0
-          max_speed: 2.0
+          max_pos: 0.367
+          min_speed: 0.001
+          default_speed: 0.008
+          max_speed: 0.012
+          waypoint_tolerance: 0.005 #0.01745330
+          goal_tolerance:     0.00001 #0.008726650
+
+        - name: joint2
+          min_pos_deg: 0.0
+          max_pos_deg: 360.0
+          min_rpm: 0.24
+          default_rpm: 0.5
+          max_rpm: 3.0
+          waypoint_tolerance: 0.01745330
+          goal_tolerance:     0.008726650

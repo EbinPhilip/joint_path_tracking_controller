@@ -26,9 +26,9 @@ bool JointPathTrackingController::init(hardware_interface::PosVelJointInterface 
     hw_ = hw;
 
     XmlRpcValue joints;
-    if (!nh.getParam("waypoint_tolerance_ratio", waypoint_tolerance_ratio_) || !nh.getParam("goal_tolerance_ratio", goal_tolerance_ratio_) || !nh.getParam("speed_backoff_ratio", speed_backoff_ratio_) || !nh.getParam("joints", joints))
+    if (!nh.getParam("joints", joints))
     {
-        ROS_ERROR("JointPathTrackingController: parameters missing");
+        ROS_ERROR("JointPathTrackingController: parameter joint is missing");
         throw std::runtime_error("JointPathTrackingController: parameters missing");
     }
 

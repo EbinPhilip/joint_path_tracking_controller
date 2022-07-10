@@ -44,10 +44,6 @@ namespace jpt_controller
 
         actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> as_;
 
-        double waypoint_tolerance_ratio_;
-        double goal_tolerance_ratio_;
-        double speed_backoff_ratio_;
-
         bool preempted_ = false;
         std::mutex preempt_mutex_;
 

@@ -1,10 +1,14 @@
 <launch>
+    <arg name="port" default="/dev/linear_actuator" />
+    <arg name="baud" default="115200" />
+    
     <rosparam file="$(find joint_path_tracking_controller)/config/actuators.yaml" command="load" ns="joint_path_tracking_controller_example/" />
     <rosparam file="$(find joint_path_tracking_controller)/config/joints.yaml" command="load" ns="joint_path_tracking_controller_example/" />
     <rosparam file="$(find joint_path_tracking_controller)/config/transmissions.yaml" command="load" ns="joint_path_tracking_controller_example/" />
     <rosparam file="$(find joint_path_tracking_controller)/config/controllers.yaml" command="load" />
 
     <node name="joint_path_tracking_controller_example" pkg="joint_path_tracking_controller" type="example" output="screen" />
+    <node name = "ros_serial_node" pkg="rosserial_python" type="serial_node.py" args="_port:=$(arg port) _baud:=$(arg baud)"/>
 
     <node
         name="controller_spawner"

@@ -1,5 +1,15 @@
-actuators: []
-
+actuators:
+  - package: dynamixel_x_controller
+    class: Dynamixel_X::Dynamixel_X_Actuator_Config_Parser
+    config:
+      dynx_1:
+        servo_id: 1
+        controller_name: dynx_controller
+        zero_deg: 0.0
+        cw_limit_deg: 0.0
+        ccw_limit_deg: 360.0
+        max_effort_value: 1000.0
+  
 controllers:
   - package: linear_actuator_controller
     class: Linear_Actuator::Linear_Actuator_Controller_Config_Parser
@@ -11,3 +21,10 @@ controllers:
         max_position: 90000
         max_speed: 2400.0
         max_acceleration: 2400.0
+  - package: dynamixel_x_controller
+    class: Dynamixel_X::Dynamixel_X_Controller_Config_Parser
+    config:
+      dynx_controller:
+        controller_id: 1
+        port: /dev/u2d2_test
+        baud_rate: 57600

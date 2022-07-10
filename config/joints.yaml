@@ -1,4 +1,7 @@
 joints:
-  joint3:
+  joint1:
     type: PosVelControlledJoint
     default_speed: 0.012 # 2400 micro steps/s : 2400*(1.8/8)*(0.008/360) 
+  joint2:
+    type: PosVelControlledJoint
+    default_rpm: 1.0 #0.012 # 2400 micro steps/s : 2400*(1.8/8)*(0.008/360) 

@@ -5,9 +5,9 @@ transmissions:
   #   actuators:
   #     - linear_actuator_controller_actuator
   #   type: transmission_interface::SimpleTransmission
-  transmission_3:
+  transmission_1:
     joints:
-      - joint3
+      - joint1
     actuators:
       - linear_actuator_controller_actuator
     type: Linear_Actuator::Transmission_Loader
@@ -15,5 +15,14 @@ transmissions:
     min_step_deg: 1.8
     micro_steps: 8
     lead: 0.008
+  transmission_2:
+    joints:
+      - joint2
+    actuators:
+      - dynx_1
+    type: transmission_interface::SimpleTransmission
+
+
+  
 
 

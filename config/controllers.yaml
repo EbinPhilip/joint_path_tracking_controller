@@ -4,4 +4,12 @@ joint_state_controller:
 
 joint3_controller:
     type: joint_path_tracking_controller/JointPathTrackingController
-    joint: joint3
+    waypoint_tolerance_ratio: 0.8
+    goal_tolerance_ratio: 0.95
+    speed_backoff_ratio: 0.2
+    joints:
+        - name: joint3
+          min_pos: 0.0
+          max_pos: 4.0
+          default_speed: 1.0
+          max_speed: 2.0

@@ -25,8 +25,10 @@ namespace jpt_controller
 
         hardware_interface::PosVelJointHandle handle;
 
-        double current_start_pos = 0;
-        double current_end_pos = 0;
+        // joint is enabled only if present in current trajectory(goal),
+        // if disabled, must hold current position fetched from handle
+        double enabled = false; 
+        double current_wp_end_pos = 0;
         double current_pos;
 
         double min_pos;

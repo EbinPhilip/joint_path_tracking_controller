@@ -105,7 +105,7 @@ void JointPathTrackingController::update(const ros::Time &time,
 {
     if (!preempted_ && has_goal)
     {
-        std::lock_guard<std::mutex> path_lock(path_mutex_);
+        std::lock_guard<std::mutex> path_lock(joint_path_mutex_);
 
         if (!path_complete_)
         {
@@ -120,8 +120,9 @@ void JointPathTrackingController::update(const ros::Time &time,
                     for (int i = 0; i < path_.joint_names.size(); ++i)
                     {
                         auto& joint = joint_map_.at(path_.joint_names[i].c_str());
-                        joint.current_start_pos = joint.handle.getPosition();
-                        joint.current_end_pos = path_.points[idx_-1].positions[i];
+                        // enable and set waypoint for this joint
+                        joint.enabled = true;
+                        joint.current_wp_end_pos = path_.points[idx_-1].positions[i];
                     }
                 }
                 else // last waypoint reached
@@ -137,16 +138,21 @@ void JointPathTrackingController::update(const ros::Time &time,
             for (auto &joint_pair : joint_map_)
             {
                 auto &joint = joint_pair.second;
-                // store current joint position, for action feedback
-                joint.current_pos = joint.handle.getPosition();
-
-                // joint has reached waypoint
-                if (fabs(joint.current_end_pos - joint.current_pos) < joint.waypoint_tolerance)
+                if (!joint.enabled) // joint not specified in current trajectory
                 {
                     continue;
                 }
 
-                double distance = fabs(joint.current_end_pos - joint.current_pos) 
+                // store current joint position, for action feedback
+                joint.current_pos = joint.handle.getPosition();
+
+                // joint has reached waypoint
+                if (fabs(joint.current_wp_end_pos - joint.current_pos) < joint.waypoint_tolerance)
+                {
+                    continue;
+                }
+
+                double distance = fabs(joint.current_wp_end_pos - joint.current_pos) 
                         / fabs(joint.max_pos - joint.min_pos); // normalize position difference
                 if (distance > max_distance)
                 {
@@ -167,20 +173,27 @@ void JointPathTrackingController::update(const ros::Time &time,
             // get max scaled speed for the "max joint"               
             double max_speed = max_joint.max_speed;
             // use position difference and max_speed to get the time required to reach waypoint
-            double wp_time = fabs(max_joint.current_end_pos - max_joint.current_pos)/max_speed;
+            double wp_time = fabs(max_joint.current_wp_end_pos - max_joint.current_pos)/max_speed;
 
             // calculate speed for each joint using common wp_time
             // but individual postion differences
             for (auto& joint_pair : joint_map_)
             {
                 auto& joint = joint_pair.second;
-                if (joint_pair.first == max_distance_joint) // handle "max joint"
+                if (!joint.enabled) // joint not specified in current trajectory
                 {
-                    joint.handle.setCommand(joint.current_end_pos, max_speed);
+                    // hold current position
+                    joint.handle.setCommand(joint.handle.getPosition(), joint.default_speed);
                     continue;
                 }
 
-                double speed = fabs(joint.current_end_pos-joint.current_pos) / wp_time;
+                if (joint_pair.first == max_distance_joint) // handle "max joint"
+                {
+                    joint.handle.setCommand(joint.current_wp_end_pos, max_speed);
+                    continue;
+                }
+
+                double speed = fabs(joint.current_wp_end_pos-joint.current_pos) / wp_time;
 
                 // limit speed to joint limits
                 if (speed<joint.min_speed)
@@ -192,7 +205,7 @@ void JointPathTrackingController::update(const ros::Time &time,
                     speed = joint.max_speed;
                 }
 
-                joint.handle.setCommand(joint.current_end_pos, speed);
+                joint.handle.setCommand(joint.current_wp_end_pos, speed);
             }
         }
         else // path complete
@@ -203,12 +216,19 @@ void JointPathTrackingController::update(const ros::Time &time,
             for (auto& joint_pair : joint_map_)
             {
                 auto& joint = joint_pair.second;
+                if (!joint.enabled) // joint not specified in current trajectory
+                {
+                    // hold current position
+                    joint.handle.setCommand(joint.handle.getPosition(), joint.default_speed);
+                    continue;
+                }
+
                 joint.current_pos = joint.handle.getPosition();
-                if (fabs(joint.current_pos - joint.current_end_pos) < joint.goal_tolerance)
+                if (fabs(joint.current_pos - joint.current_wp_end_pos) < joint.goal_tolerance)
                 {
                     ++joints_not_reached_goal;
                 }
-                joint.handle.setCommand(joint.current_end_pos, joint.default_speed);
+                joint.handle.setCommand(joint.current_wp_end_pos, joint.default_speed);
             }
 
             if (joints_not_reached_goal == 0)
@@ -264,7 +284,14 @@ void JointPathTrackingController::_holdCurrentPosition()
 
 void JointPathTrackingController::_lockAndReplacePath(const trajectory_msgs::JointTrajectory& path)
 {
-    std::lock_guard<std::mutex> path_lock(path_mutex_);
+    std::lock_guard<std::mutex> path_lock(joint_path_mutex_);
+
+    // reset all joint goals
+    for (auto& joint_pair : joint_map_)
+    {
+        joint_pair.second.enabled = false;
+    }
+
     idx_ = 0;
     path_ = path;
     waypoint_reached_ = true; // should be true at the start of each path
@@ -274,6 +301,29 @@ void JointPathTrackingController::_lockAndReplacePath(const trajectory_msgs::Joi
 
 void JointPathTrackingController::_executeCB(const control_msgs::FollowJointTrajectoryGoalConstPtr& goal)
 {
+    // check if trajectory is valid
+    if (goal->trajectory.joint_names.empty() // no joint names
+        || goal->trajectory.points.empty() // no joint points 
+        || goal->trajectory.points[0].positions.empty()) // positions vector is empty
+    {
+        control_msgs::FollowJointTrajectoryResult result;
+        result.error_code = result.INVALID_GOAL;
+        as_.setAborted(result);
+        return;
+    }
+
+    // check if all joints specified in the goal are present
+    for (int i = 0; i < goal->trajectory.joint_names.size(); ++i)
+    {
+        if (joint_map_.find(goal->trajectory.joint_names[i]) == joint_map_.end())
+        {
+            control_msgs::FollowJointTrajectoryResult result;
+            result.error_code = result.INVALID_JOINTS;
+            as_.setAborted(result);
+            return;
+        }
+    }
+
     // preempt and replace existing path
     {
         std::lock_guard<std::mutex> preempt_lock(preempt_mutex_);
@@ -310,8 +360,8 @@ void JointPathTrackingController::_executeCB(const control_msgs::FollowJointTraj
                 auto& joint = joint_map_.at(path_.joint_names[i]);
 
                 feedback.actual.positions[i] = joint.current_pos;
-                feedback.desired.positions[i] = joint.current_end_pos;
-                feedback.error.positions[i] = joint.current_end_pos - joint.current_pos;
+                feedback.desired.positions[i] = joint.current_wp_end_pos;
+                feedback.error.positions[i] = joint.current_wp_end_pos - joint.current_pos;
             }
 
             as_.publishFeedback(feedback);

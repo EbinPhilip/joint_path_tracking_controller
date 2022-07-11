@@ -44,19 +44,25 @@ namespace jpt_controller
 
         actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> as_;
 
-        bool preempted_ = false;
-        std::mutex preempt_mutex_;
-
         bool has_goal = false;
 
-        std::mutex path_mutex_;
+        // lock on this mutex must be acquired before writing to any of the following fields
+        std::mutex preempt_mutex_;
+        ////// start of fields synchronized by joint_path_mutex //////
+        bool preempted_ = false;
+        ////// end of fields synchronized by preempt_mutex_ //////
+
+
+        // lock on this mutex must be acquired before writing to any of the following fields
+        std::mutex joint_path_mutex_;
+        ////// start of fields synchronized by joint_path_mutex //////
         unsigned int idx_ = 0; // path point index : 1 based
         trajectory_msgs::JointTrajectory path_;
         bool path_complete_ = false; // all path points have been achieved within waypoint tolerance
         bool waypoint_reached_ = true; // should be true at the start of each path
         bool goal_reached_ = false; // last path point has been achieved within goal tolerance
-
         std::map<std::string, JointData> joint_map_;
+        ////// end of fields synchronized by joint_path_mutex //////
     };
 
 }

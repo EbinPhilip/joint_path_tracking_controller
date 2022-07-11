@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 #include <mutex>
+#include <memory>
 
 namespace jpt_controller
 {
@@ -42,7 +43,8 @@ namespace jpt_controller
 
         hardware_interface::PosVelJointInterface *hw_;
 
-        actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> as_;
+        typedef actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> JointAction;
+        std::unique_ptr<JointAction> as_;
 
         bool has_goal = false;
 

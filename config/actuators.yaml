@@ -7,6 +7,7 @@ actuators:
         controller_name: dynx_controller
         zero_deg: 0.0
         cw_limit_deg: 0.0
+        profile_acceleration: 1
         ccw_limit_deg: 360.0
         max_effort_value: 1000.0
   

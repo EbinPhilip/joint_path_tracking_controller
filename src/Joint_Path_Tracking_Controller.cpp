@@ -15,7 +15,6 @@ using namespace XmlRpc;
 using namespace RUnits;
 
 JointPathTrackingController::JointPathTrackingController()
-    : as_("FollowJointTrajectory", boost::bind(&JointPathTrackingController::_executeCB, this, _1), true)
 {
 }
 
@@ -24,6 +23,9 @@ bool JointPathTrackingController::init(hardware_interface::PosVelJointInterface 
 {
     assert(hw);
     hw_ = hw;
+
+    as_.reset(new JointAction(nh, "FollowJointTrajectory", 
+        boost::bind(&JointPathTrackingController::_executeCB, this, _1), true));
 
     XmlRpcValue joints;
     if (!nh.getParam("joints", joints))
@@ -97,7 +99,7 @@ bool JointPathTrackingController::init(hardware_interface::PosVelJointInterface 
 bool JointPathTrackingController::init(hardware_interface::PosVelJointInterface *hw,
                                        ros::NodeHandle &root_nh, ros::NodeHandle &nh)
 {
-    return init(hw, nh);
+    return true;
 }
 
 void JointPathTrackingController::update(const ros::Time &time,
@@ -315,7 +317,7 @@ void JointPathTrackingController::_executeCB(const control_msgs::FollowJointTraj
     {
         control_msgs::FollowJointTrajectoryResult result;
         result.error_code = result.INVALID_GOAL;
-        as_.setAborted(result);
+        as_->setAborted(result);
         return;
     }
 
@@ -326,7 +328,7 @@ void JointPathTrackingController::_executeCB(const control_msgs::FollowJointTraj
         {
             control_msgs::FollowJointTrajectoryResult result;
             result.error_code = result.INVALID_JOINTS;
-            as_.setAborted(result);
+            as_->setAborted(result);
             return;
         }
     }
@@ -343,13 +345,13 @@ void JointPathTrackingController::_executeCB(const control_msgs::FollowJointTraj
     }
 
     ros::Rate rate(2);
-    while (ros::ok() && !as_.isPreemptRequested())
+    while (ros::ok() && !as_->isPreemptRequested())
     {
         if (goal_reached_)
         {
             control_msgs::FollowJointTrajectoryResult result;
             result.error_code = result.SUCCESSFUL;
-            as_.setSucceeded(result);
+            as_->setSucceeded(result);
             return;
         }
         else
@@ -371,7 +373,7 @@ void JointPathTrackingController::_executeCB(const control_msgs::FollowJointTraj
                 feedback.error.positions[i] = joint.current_wp_end_pos - joint.current_pos;
             }
 
-            as_.publishFeedback(feedback);
+            as_->publishFeedback(feedback);
         }
 
         rate.sleep();

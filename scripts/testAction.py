@@ -11,7 +11,7 @@ def feedback_cb(feedback):
     pass
 
 def fjt_action_client():
-    client = actionlib.SimpleActionClient('FollowJointTrajectory', FJTA)
+    client = actionlib.SimpleActionClient('joint3_controller/FollowJointTrajectory', FJTA)
 
     client.wait_for_server()
 

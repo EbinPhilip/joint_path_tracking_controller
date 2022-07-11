@@ -30,6 +30,7 @@ namespace jpt_controller
         double enabled = false; 
         double current_wp_end_pos = 0;
         double current_pos;
+        double last_speed = -1.0;
 
         double min_pos;
         double max_pos;

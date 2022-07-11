@@ -226,7 +226,7 @@ void JointPathTrackingController::update(const ros::Time &time,
                 }
 
                 joint.current_pos = joint.handle.getPosition();
-                if (fabs(joint.current_pos - joint.current_wp_end_pos) < joint.goal_tolerance)
+                if (fabs(joint.current_pos - joint.current_wp_end_pos) > joint.goal_tolerance)
                 {
                     ++joints_not_reached_goal;
                 }

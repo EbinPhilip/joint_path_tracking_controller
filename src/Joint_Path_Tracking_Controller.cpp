@@ -208,7 +208,6 @@ void JointPathTrackingController::update(const ros::Time &time,
                 }
 
                 joint.handle.setCommand(joint.current_wp_end_pos, speed);
-                joint.last_speed = speed;
             }
         }
         else // path complete
@@ -232,10 +231,6 @@ void JointPathTrackingController::update(const ros::Time &time,
                     ++joints_not_reached_goal;
                 }
                 double speed = joint.default_speed;
-                if (joint.last_speed > joint.min_speed)
-                {
-                    speed = joint.last_speed;
-                }
                 joint.handle.setCommand(joint.current_wp_end_pos, speed);
             }
 
@@ -298,7 +293,6 @@ void JointPathTrackingController::_lockAndReplacePath(const trajectory_msgs::Joi
     for (auto& joint_pair : joint_map_)
     {
         joint_pair.second.enabled = false;
-        joint_pair.second.last_speed = -1.0;
     }
 
     idx_ = 0;
